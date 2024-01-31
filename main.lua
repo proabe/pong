@@ -12,6 +12,7 @@ VIRTUAL_HEIGHT=243
 PADDLE_SPEED=200
 
 function love.load()
+    love.window.setTitle('Pong')
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     math.randomseed(os.time())
@@ -36,6 +37,37 @@ function love.load()
 end
 
 function love.update(dt)
+    if gameState == 'play' then
+        if ball:collides(player1) then
+            ball.dx = -ball.dx * 1.03
+            ball.x = player1.x + 4
+
+            if ball.dy < 0 then
+                ball.dy = -math.random(10, 150)
+            else
+                ball.dy = math.random(10, 150)
+            end
+        end
+        if ball:collides(player2) then
+            ball.dx = -ball.dx * 1.03
+            ball.x = player2.x - 4
+
+            if ball.dy < 0 then
+                ball.dy = -math.random(10, 150)
+            else
+                ball.dy = math.random(10, 150)
+            end
+        end
+        if ball.y <=0 then
+            ball.y = 0
+            ball.dy = -ball.dy
+        end
+
+        if ball.y >= VIRTUAL_HEIGHT - 4 then
+            ball.y = VIRTUAL_HEIGHT - 4
+            ball.dy = -ball.dy
+        end
+    end
     if love.keyboard.isDown('w') then
         player1.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('s') then
@@ -84,5 +116,12 @@ function love.draw()
     player1:render()
     player2:render()
     ball:render()
+    drawFPS()
     push:apply('end')
+end
+
+function drawFPS()
+    love.graphics.setFont(smallFont)
+    love.graphics.setColor(0, 255, 0, 255)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
 end
